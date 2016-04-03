@@ -4,24 +4,37 @@
 serialDuplexTest.js
 
 Tests the functionality of the serial port library.
-To be used in conjunction with the Arduino sketch called ArduinoEcho.ino
+To be used in conjunction with the Arduino sketch ArduinoEcho.ino
 */
 'use strict';
+var SerialPort = require('../serialport').SerialPort;
+var optimist = require('optimist');
 
-// serial port initialization:
-var serialport = require('../serialport');     // include the serialport library
-var SerialPort = serialport.SerialPort;         // make a local instance of serial
-var portName = process.argv[2];                 // get the port name from the command line
-var myPort = new SerialPort(portName);          // open the serial port:
+var args = optimist
+  .alias('h', 'help')
+  .alias('h', '?')
+  .usage('Run printable characters through the serial port\n Usage: $0')
+  .options('p', {
+    describe: 'Name of serial port. See serialportlist for available serial ports.'
+  })
+  .demand(['p'])
+  .argv;
+
+if (args.help) {
+  optimist.showHelp();
+  return process.exit(0);
+}
+
+var port = new SerialPort(args.p);          // open the serial port:
 var output = 32;                                // ASCII space; lowest printable character
 var byteCount = 0;                              // number of bytes read
 
 function openPort() {
   console.log('port open');
-  console.log('baud rate: ' + myPort.options.baudRate);
+  console.log('baud rate: ' + port.options.baudRate);
   var outString = String.fromCharCode(output);
   console.log('String is: ' + outString);
-  myPort.write(outString);
+  port.write(outString);
 }
 
 function receiveData(data) {
@@ -34,7 +47,7 @@ function receiveData(data) {
   console.log('Byte count: ' + byteCount);
   byteCount++;
   var outString = String.fromCharCode(output);
-  myPort.write(outString);
+  port.write(outString);
   console.log('Sent: ' + outString);
 }
 
@@ -46,7 +59,7 @@ function serialError(error) {
   console.log('there was an error with the serial port: ' + error);
 }
 
-myPort.on('open', openPort);      // called when the serial port opens
-myPort.on('data', receiveData);    // called when data comes in
-myPort.on('close', closePort);    // called when the serial port closes
-myPort.on('error', serialError);  // called when there's an error with the serial port
+port.on('open', openPort);      // called when the serial port opens
+port.on('data', receiveData);    // called when data comes in
+port.on('close', closePort);    // called when the serial port closes
+port.on('error', serialError);  // called when there's an error with the serial port

@@ -67,6 +67,7 @@
     "grunt-cli": "*",
     "grunt-mocha-test": "*",
     "gruntify-eslint": "^2.0.0",
+    "memwatch-next": "^0.2.10",
     "mocha": "*",
     "sandboxed-module": "^2.0.3",
     "sinon": "*",
@@ -83,6 +84,7 @@
   "scripts": {
     "install": "node-pre-gyp install --fallback-to-build",
     "rebuild": "node-pre-gyp rebuild",
+    "stress": "mocha --no-timeouts arduinoTest/stress.js",
     "test": "grunt --verbose"
   }
 }
